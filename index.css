@@ -1,0 +1,58 @@
+/* WriteWise AI Dark Mode Overrides */
+
+/* Base theme flag */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Global adjustments */
+:root[data-theme="dark"] body {
+  background-color: #0b1220; /* deep slate */
+  color: #e2e8f0; /* slate-200/100 */
+}
+
+/* Background overrides */
+:root[data-theme="dark"] .bg-white { background-color: #0f172a !important; }
+:root[data-theme="dark"] .bg-white\/50 { background-color: rgba(15,23,42,0.5) !important; }
+:root[data-theme="dark"] .bg-white\/60 { background-color: rgba(15,23,42,0.6) !important; }
+:root[data-theme="dark"] .bg-slate-50 { background-color: #0f172a !important; }
+:root[data-theme="dark"] .bg-slate-50\/50 { background-color: rgba(15,23,42,0.5) !important; }
+:root[data-theme="dark"] .bg-slate-50\/30 { background-color: rgba(15,23,42,0.3) !important; }
+:root[data-theme="dark"] .bg-\[\#f8fafc\] { background-color: #0b1220 !important; }
+
+/* Text color overrides */
+:root[data-theme="dark"] .text-slate-900, 
+:root[data-theme="dark"] .text-slate-800 { color: #e2e8f0 !important; }
+:root[data-theme="dark"] .text-slate-700 { color: #cbd5e1 !important; }
+:root[data-theme="dark"] .text-slate-500 { color: #94a3b8 !important; }
+:root[data-theme="dark"] .text-slate-400 { color: #64748b !important; }
+
+/* Borders */
+:root[data-theme="dark"] .border-slate-100 { border-color: #1f2937 !important; }
+:root[data-theme="dark"] .border-slate-200 { border-color: #334155 !important; }
+:root[data-theme="dark"] .border-slate-200\/60 { border-color: rgba(51,65,85,0.6) !important; }
+:root[data-theme="dark"] .border-indigo-100 { border-color: #1e293b !important; }
+
+/* Prose content (output text) */
+:root[data-theme="dark"] .prose.prose-slate { color: #cbd5e1 !important; }
+:root[data-theme="dark"] .prose.prose-slate p { color: #cbd5e1 !important; }
+
+/* Inputs and textarea */
+:root[data-theme="dark"] textarea::placeholder { color: #475569 !important; }
+
+/* Scrollbar (dark) */
+:root[data-theme="dark"] ::-webkit-scrollbar-track { background: #0f172a; }
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #334155; }
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* Button variations where slate backgrounds are used */
+:root[data-theme="dark"] .hover\:bg-slate-50:hover { background-color: #111827 !important; }
+
+/* Selection color tweak for dark */
+:root[data-theme="dark"] body::selection {
+  background: #3638ff33;
+  color: #e2e8f0;
+}
