@@ -12,11 +12,10 @@ interface LayoutProps {
 }
 
 const Logo = () => (
-  <div className="flex items-center gap-4 group">
+  <a href="/" className="flex items-center gap-4 group" style={{ textDecoration: 'none' }}>
     <div className="relative">
       {/* Outer Glow */}
       <div className="absolute inset-0 bg-indigo-500/20 blur-xl rounded-2xl group-hover:bg-indigo-500/30 transition-all duration-500"></div>
-      
       {/* Icon Container */}
       <div className="relative w-12 h-12 bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-500 rounded-2xl flex items-center justify-center shadow-[0_8px_16px_-4px_rgba(79,70,229,0.4)] group-hover:shadow-[0_12px_20px_-4px_rgba(79,70,229,0.5)] group-hover:-translate-y-0.5 transition-all duration-300 ring-1 ring-white/20">
         <svg 
@@ -35,7 +34,6 @@ const Logo = () => (
         </svg>
       </div>
     </div>
-    
     <div className="flex flex-col">
       <h1 className="text-xl font-black tracking-tighter text-slate-900 leading-none">
         Write<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-500">Wise</span>
@@ -45,7 +43,7 @@ const Logo = () => (
         <div className="h-px w-3 bg-slate-200"></div>
       </div>
     </div>
-  </div>
+  </a>
 );
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTool, onToolSelect, theme, onToggleTheme }) => {
