@@ -63,11 +63,11 @@ const App: React.FC = () => {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  // Show Home page if on "/" with no tool param
-  const isHome = typeof window !== 'undefined' && (!window.location.search || window.location.search === '?');
+  // Show Home page only if there is NO ?tool param
+  const hasToolParam = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('tool');
   return (
     <Layout activeTool={activeTool} onToolSelect={setActiveTool} theme={theme} onToggleTheme={toggleTheme}>
-      {isHome ? <Home /> : <WritingArea tool={activeTool} />}
+      {hasToolParam ? <WritingArea tool={activeTool} /> : <Home />}
     </Layout>
   );
 };
