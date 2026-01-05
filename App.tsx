@@ -6,20 +6,20 @@ import Home from './components/Home';
 import { ToolType } from './types';
 
 const App: React.FC = () => {
-  const getToolFromUrl = (): ToolType => {
+  const getToolFromUrl = (): ToolType | null => {
     try {
       const url = new URL(window.location.href);
       const qp = url.searchParams.get('tool');
-      if (!qp) return ToolType.ARTICLE_REWRITER;
+      if (!qp) return null;
       const key = qp.toUpperCase();
       if ((ToolType as any)[key]) return (ToolType as any)[key] as ToolType;
-      return ToolType.ARTICLE_REWRITER;
+      return null;
     } catch {
-      return ToolType.ARTICLE_REWRITER;
+      return null;
     }
   };
 
-  const [activeTool, setActiveTool] = useState<ToolType>(getToolFromUrl());
+  const [activeTool, setActiveTool] = useState<ToolType | null>(getToolFromUrl());
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('theme');
@@ -48,7 +48,11 @@ const App: React.FC = () => {
   useEffect(() => {
     try {
       const url = new URL(window.location.href);
-      url.searchParams.set('tool', activeTool);
+      if (activeTool) {
+        url.searchParams.set('tool', activeTool);
+      } else {
+        url.searchParams.delete('tool');
+      }
       window.history.replaceState(null, '', url.toString());
     } catch {}
   }, [activeTool]);
@@ -63,11 +67,10 @@ const App: React.FC = () => {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  // Show Home page only if there is NO ?tool param
-  const hasToolParam = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('tool');
+  // Show Home page only if there is NO ?tool param (activeTool is null)
   return (
     <Layout activeTool={activeTool} onToolSelect={setActiveTool} theme={theme} onToggleTheme={toggleTheme}>
-      {hasToolParam ? <WritingArea tool={activeTool} /> : <Home />}
+      {activeTool ? <WritingArea tool={activeTool} /> : <Home />}
     </Layout>
   );
 };
