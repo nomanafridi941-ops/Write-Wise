@@ -1,9 +1,6 @@
 
-import { GoogleGenAI } from "@google/genai";
 import { ToolType, WritingMode } from '../types';
 import { GLOBAL_SYSTEM_PROMPT } from '../constants';
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
 const PROMPT_TEMPLATES: Record<ToolType, (input: string) => string> = {
   [ToolType.ARTICLE_REWRITER]: (input) => `Rewrite the following article. Rules: Improve clarity, SEO-friendly, natural transitions, keep length. Article:\n${input}`,
@@ -78,6 +75,7 @@ const PROMPT_TEMPLATES: Record<ToolType, (input: string) => string> = {
     3. A plan to outrank them with better content structure.`
 };
 
+
 export const generateWritingContent = async (
   tool: ToolType,
   input: string,
@@ -86,26 +84,42 @@ export const generateWritingContent = async (
   if (!input.trim()) return "Please provide some text to process.";
 
   let prompt = PROMPT_TEMPLATES[tool](input);
-  
   if (tool === ToolType.ARTICLE_REWRITER) {
     if (mode === WritingMode.SEO) prompt += "\n- FOCUS: SEO optimization.";
     else if (mode === WritingMode.SIMPLE) prompt += "\n- FOCUS: Beginner English.";
     else if (mode === WritingMode.PROFESSIONAL) prompt += "\n- FOCUS: Business tone.";
   }
 
+  const API_KEY = process.env.API_KEY || "ts-abc123def456ghi789jkl012mno345pqr678stu901vwx234yz";
+  const url = "https://api.together.ai/v1/chat/completions";
+  const payload = {
+    model: "meta-llama/Llama-3.1-405B-Instruct-Turbo",
+    messages: [
+      { role: "system", content: GLOBAL_SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ],
+    max_tokens: 2000,
+    temperature: 0.7
+  };
+  const headers = {
+    "Authorization": `Bearer ${API_KEY}`,
+    "Content-Type": "application/json"
+  };
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: {
-        systemInstruction: GLOBAL_SYSTEM_PROMPT,
-        temperature: 0.7,
-      }
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload)
     });
-
-    return response.text || "No content generated.";
+    if (!response.ok) throw new Error("Llama API Error: " + response.statusText);
+    const data = await response.json();
+    return (
+      data.choices?.[0]?.message?.content ||
+      data.choices?.[0]?.text ||
+      "No content generated."
+    );
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    console.error("Llama API Error:", error);
     throw new Error("Failed to generate content. Please try again.");
   }
 };
