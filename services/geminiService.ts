@@ -90,36 +90,25 @@ export const generateWritingContent = async (
     else if (mode === WritingMode.PROFESSIONAL) prompt += "\n- FOCUS: Business tone.";
   }
 
-  const API_KEY = process.env.API_KEY || "ts-abc123def456ghi789jkl012mno345pqr678stu901vwx234yz";
-  const url = "https://api.together.ai/v1/chat/completions";
+  // Call local backend proxy instead of Together AI API directly
+  const url = "http://localhost:5000/api/llama";
   const payload = {
-    model: "meta-llama/Llama-3.1-405B-Instruct-Turbo",
-    messages: [
-      { role: "system", content: GLOBAL_SYSTEM_PROMPT },
-      { role: "user", content: prompt }
-    ],
+    prompt,
+    systemPrompt: GLOBAL_SYSTEM_PROMPT,
     max_tokens: 2000,
     temperature: 0.7
-  };
-  const headers = {
-    "Authorization": `Bearer ${API_KEY}`,
-    "Content-Type": "application/json"
   };
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-    if (!response.ok) throw new Error("Llama API Error: " + response.statusText);
     const data = await response.json();
-    return (
-      data.choices?.[0]?.message?.content ||
-      data.choices?.[0]?.text ||
-      "No content generated."
-    );
+    if (!response.ok) throw new Error(data.error || "Llama API Error");
+    return data.content || "No content generated.";
   } catch (error) {
-    console.error("Llama API Error:", error);
+    console.error("Llama Proxy Error:", error);
     throw new Error("Failed to generate content. Please try again.");
   }
 };
