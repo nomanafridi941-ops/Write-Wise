@@ -76,6 +76,7 @@ const PROMPT_TEMPLATES: Record<ToolType, (input: string) => string> = {
 };
 
 
+
 export const generateWritingContent = async (
   tool: ToolType,
   input: string,
@@ -83,32 +84,40 @@ export const generateWritingContent = async (
 ): Promise<string> => {
   if (!input.trim()) return "Please provide some text to process.";
 
-  let prompt = PROMPT_TEMPLATES[tool](input);
-  if (tool === ToolType.ARTICLE_REWRITER) {
-    if (mode === WritingMode.SEO) prompt += "\n- FOCUS: SEO optimization.";
-    else if (mode === WritingMode.SIMPLE) prompt += "\n- FOCUS: Beginner English.";
-    else if (mode === WritingMode.PROFESSIONAL) prompt += "\n- FOCUS: Business tone.";
-  }
-
-  // Call local backend proxy instead of Together AI API directly
-  const url = "http://localhost:5000/api/llama";
-  const payload = {
-    prompt,
-    systemPrompt: GLOBAL_SYSTEM_PROMPT,
-    max_tokens: 2000,
-    temperature: 0.7
-  };
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Llama API Error");
-    return data.content || "No content generated.";
-  } catch (error) {
-    console.error("Llama Proxy Error:", error);
-    throw new Error("Failed to generate content. Please try again.");
+  // Rule-based logic for each tool
+  switch (tool) {
+    case ToolType.GRAMMAR_FIXER:
+      // Very basic grammar fixer (example: fix common mistakes)
+      return input.replace(/\bi am\b/gi, 'I am').replace(/\bi dont\b/gi, "I don't").replace(/\bi cant\b/gi, "I can't");
+    case ToolType.KEYWORD_DENSITY:
+      // Count frequency of each word
+      const words = input.toLowerCase().match(/\b\w+\b/g) || [];
+      const freq: Record<string, number> = {};
+      words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+      return Object.entries(freq).map(([k, v]) => `${k}: ${v}`).join(', ');
+    case ToolType.SHORTENER:
+      // Return first 30 words
+      return input.split(/\s+/).slice(0, 30).join(' ') + (input.split(/\s+/).length > 30 ? '...' : '');
+    case ToolType.PARAPHRASER:
+      // Simple synonym replacement (example only)
+      return input.replace(/important/gi, 'crucial').replace(/good/gi, 'excellent');
+    case ToolType.TITLE_GENERATOR:
+      // Return first sentence as title
+      return input.split(/[.!?]/)[0].trim();
+    case ToolType.KEYWORD_IDEAS:
+      // Return unique words as keyword ideas
+      return Array.from(new Set(input.toLowerCase().match(/\b\w+\b/g) || [])).join(', ');
+    case ToolType.SENTENCE_REWRITER:
+      // Return the sentence reversed as a demo
+      return input.split('').reverse().join('');
+    case ToolType.READABILITY_IMPROVER:
+      // Remove long words (over 10 chars)
+      return input.split(' ').filter(w => w.length <= 10).join(' ');
+    case ToolType.SIMPLIFIER:
+      // Remove adjectives/adverbs (very basic)
+      return input.replace(/\b(very|really|extremely|absolutely|amazingly)\b/gi, '');
+    default:
+      // For all other tools, just return the input (no AI logic)
+      return input;
   }
 };
